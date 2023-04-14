@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ground
+  - Sobre
+  - Zombie
+  - Pared
   layers:
   - Default
   - TransparentFX

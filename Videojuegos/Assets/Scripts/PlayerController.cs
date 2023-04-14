@@ -11,9 +11,11 @@ public class PlayerController : MonoBehaviour
     //VARIABLES INTERCAMBIABLES
     bool vivo = true;
     bool isGrounded;
+    //bool saltado = false;
+    bool isTouchingWall;
     int velocidad = 10;
-    float jumpForce = 7;
-
+    float jumpForce = 15;
+    int saltos = 0;
     //VARIBLES EST�TICOS
     const int estadoQuieto = 0;
     const int estadoCaminar = 1;
@@ -61,6 +63,7 @@ public class PlayerController : MonoBehaviour
             rb.velocity = new Vector2(0, rb.velocity.y);
             CambiarAnimacion(estadoQuieto);
         }
+
     }
 
     private void Salto() {
@@ -68,14 +71,23 @@ public class PlayerController : MonoBehaviour
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             isGrounded = false;
-            
-            if(rb.velocity.y > 0)
+
+            if (rb.velocity.y > 0)
                 CambiarAnimacion(estadoSaltoUp);
+
+            saltos = 0;
+        }
+        else if (!isGrounded && isTouchingWall && Input.GetKeyDown(KeyCode.Space) && saltos < 5)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            CambiarAnimacion(estadoSaltoUp);
+
+            saltos++;
         }
 
-        if(rb.velocity.y < 0 && !isGrounded)
+        if (rb.velocity.y < 0 && !isGrounded)
             CambiarAnimacion(estadoSaltoFall);
-        
+                
     }
 
 
@@ -121,8 +133,18 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.tag == "Ground")
-            // Si el personaje choca con un objeto con el tag "Ground", se considera que está tocando el suelo
-            isGrounded = true;
+        if (other.gameObject.tag == "Ground") isGrounded = true;
+        
+        if(other.gameObject.tag == "Pared") isTouchingWall = true;
+        
+    }
+
+    void OnTriggerEnter2D(Collider2D other){
+        if(other.gameObject.tag == "Sobre") velocidad += 5;
+        if(other.gameObject.tag == "Zombie") {
+            vivo = false;
+            CambiarAnimacion(estadoDead);
+            Debug.Log("Estás muerto");
+        }
     }
 }
