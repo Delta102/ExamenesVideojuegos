@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+   public GameObject bullet;
+
     SpriteRenderer sr;
     Rigidbody2D rb;
     Animator animator;
@@ -65,6 +67,21 @@ public class PlayerController : MonoBehaviour
         }
 
     }
+    
+    private void disparo(int a){
+        if(a>0){
+            var bulletPosition=transform.position+new Vector3(a, 0,0);
+            var gb = Instantiate(bullet, bulletPosition, Quaternion.identity) as GameObject;
+            var controller= gb.GetComponent<BulletController>();
+            controller.SetRightDirection();
+        }
+        if(a<0){
+            var bulletPosition=transform.position+new Vector3(a, 0,0);
+            var gb = Instantiate(bullet, bulletPosition, Quaternion.identity) as GameObject;
+            var controller= gb.GetComponent<BulletController>();
+            controller.SetLeftDirection();
+        }
+    }
 
     private void Salto() {
         if (isGrounded && Input.GetKeyDown(KeyCode.Space))
@@ -124,11 +141,17 @@ public class PlayerController : MonoBehaviour
 
     private void Renderizado()
     {
-        if (rb.velocity.x < 0)
+        if (rb.velocity.x < 0){
             sr.flipX = true;
+            if(Input.GetKeyUp(KeyCode.F)) disparo(-3);
+        }
+            
 
-        if (rb.velocity.x > 0)
+        if (rb.velocity.x >= 0){
             sr.flipX = false;
+            if(Input.GetKeyUp(KeyCode.F)) disparo(3);
+        }
+            
     }
 
     void OnCollisionEnter2D(Collision2D other)
