@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ZombieController : MonoBehaviour
 {
+    GameManagerController gameManager;
+
     Rigidbody2D rb;
     
     bool estado = true;
@@ -12,6 +14,7 @@ public class ZombieController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        gameManager = FindObjectOfType<GameManagerController>();
     }
     void Update()
     {
@@ -25,6 +28,11 @@ public class ZombieController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other){
 
-        if(other.gameObject.tag == "Player") estado = false;
+        if(other.gameObject.tag == "Player"){
+            gameManager.PerderVida();
+            if(gameManager.Vida() == 0) 
+                rb.velocity = new Vector2(0, rb.velocity.y);
+        }
+        
     }
 }

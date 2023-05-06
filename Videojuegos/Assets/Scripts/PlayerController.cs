@@ -5,20 +5,21 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
    public GameObject bullet;
+   GameManagerController gameManager;
 
     SpriteRenderer sr;
     Rigidbody2D rb;
     Animator animator;
+    AudioSource audioSource;
+    public AudioClip recolectorSound;  
 
     //VARIABLES INTERCAMBIABLES
-    bool vivo = true;
     bool isGrounded;
-    //bool saltado = false;
     bool isTouchingWall;
     int velocidad = 10;
     float jumpForce = 15;
     int saltos = 0;
-    //VARIBLES EST�TICOS
+    //VARIBLES ESTÁTICOS
     const int estadoQuieto = 0;
     const int estadoCaminar = 1;
     const int estadoAtaque = 2;
@@ -34,20 +35,28 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
+        gameManager = FindObjectOfType<GameManagerController>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (vivo) {
+        if (gameManager.Vida()>0) {
             Renderizado();
             Caminar();
             Salto();
             Ataque();
             Throw();
             Slide();
-            Muerte();
         }
+        else{
+            Debug.Log(Time.deltaTime);
+            CambiarAnimacion(estadoDead);
+        }
+        
+            
+        
     }
 
     private void Caminar()
@@ -74,6 +83,7 @@ public class PlayerController : MonoBehaviour
             var gb = Instantiate(bullet, bulletPosition, Quaternion.identity) as GameObject;
             var controller= gb.GetComponent<BulletController>();
             controller.SetRightDirection();
+            
         }
         if(a<0){
             var bulletPosition=transform.position+new Vector3(a, 0,0);
@@ -114,14 +124,6 @@ public class PlayerController : MonoBehaviour
             CambiarAnimacion(estadoAtaque);
     }
 
-    private void Muerte()
-    {
-        if (Input.GetKey(KeyCode.L)) {
-            vivo = false;
-            CambiarAnimacion(estadoDead);
-        }
-    }
-
     private void Throw()
     {
         if (Input.GetKey(KeyCode.X))
@@ -143,13 +145,21 @@ public class PlayerController : MonoBehaviour
     {
         if (rb.velocity.x < 0){
             sr.flipX = true;
-            if(Input.GetKeyUp(KeyCode.F)) disparo(-3);
+            // if(gameManager.CantidadBalas()>0)
+            //     if(Input.GetKeyUp(KeyCode.F)) {
+            //         disparo(-3);
+            //         //gameManager.PerderBalas();
+            //     }
         }
             
 
         if (rb.velocity.x >= 0){
             sr.flipX = false;
-            if(Input.GetKeyUp(KeyCode.F)) disparo(3);
+            // if(gameManager.CantidadBalas()>0)
+            //     if(Input.GetKeyUp(KeyCode.F)){
+            //         disparo(3);
+            //         //gameManager.PerderBalas();
+            //     }
         }
             
     }
@@ -159,15 +169,16 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.tag == "Ground") isGrounded = true;
         
         if(other.gameObject.tag == "Pared") isTouchingWall = true;
+
+        // if(other.gameObject.tag == "Recolector"){
+        //     //gameManager.GanarBalas();
+        //     audioSource.PlayOneShot(recolectorSound);
+        //     Destroy(other.gameObject);
+        // }
         
     }
 
     void OnTriggerEnter2D(Collider2D other){
         if(other.gameObject.tag == "Sobre") velocidad += 5;
-        if(other.gameObject.tag == "Zombie") {
-            vivo = false;
-            CambiarAnimacion(estadoDead);
-            Debug.Log("Estás muerto");
-        }
     }
 }

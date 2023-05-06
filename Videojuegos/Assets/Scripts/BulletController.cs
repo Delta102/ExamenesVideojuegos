@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BulletController : MonoBehaviour
 {
+    GameManagerController gameManager;
     Rigidbody2D rb;
     public GameObject bulletUp;
     public GameObject bulletDown;
@@ -12,6 +13,7 @@ public class BulletController : MonoBehaviour
     void Start()
     {
         rb=GetComponent<Rigidbody2D>();
+        gameManager = FindObjectOfType<GameManagerController>();
     }
 
 
@@ -61,6 +63,13 @@ public class BulletController : MonoBehaviour
     void OnCollisionEnter2D(Collision2D other)
     {
         Destroy(this.gameObject);
-        if (other.gameObject.tag == "Zombie") Destroy(other.gameObject);
+        if (other.gameObject.tag == "Zombie"){
+            gameManager.PerderVidaZombie();
+            if(gameManager.VidaZombie() == 0){
+                Destroy(other.gameObject);
+                gameManager.ConteoZombies();
+                gameManager.vidaZombie = 2;
+            }
+        }
     }
 }

@@ -8,6 +8,9 @@ TagManager:
   - Sobre
   - Zombie
   - Pared
+  - Recolector
+  - Portal
+  - PortalCambio
   layers:
   - Default
   - TransparentFX
